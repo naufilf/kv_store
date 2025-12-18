@@ -1,4 +1,4 @@
-#Distributed Key-Value Store (C++, gRPC, Bazel)
+# Distributed Key-Value Store (C++, gRPC, Bazel)
 
 A distributed, sharded key-value store built using the modern Google infrastructure stack.
 
