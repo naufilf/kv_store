@@ -1,0 +1,11 @@
+bazel-*
+*.runfiles
+
+.vscode/
+.idea/
+*.swp
+*.DS_Store
+
+*.o
+*.so
+*.dylib
