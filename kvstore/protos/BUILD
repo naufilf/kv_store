@@ -1,0 +1,32 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
+load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+proto_library(
+    name = "kv_store_proto",
+    srcs = ["kv_store.proto"],
+)
+
+cc_proto_library(
+    name = "kv_store_cc_proto",
+    deps = [":kv_store_proto"],
+)
+
+proto_library(
+    name = "wal_proto",
+    srcs = ["wal.proto"],
+)
+
+cc_proto_library(
+    name = "wal_cc_proto",
+    deps = [":wal_proto"],
+)
+
+cc_grpc_library(
+    name = "kv_store_cc_grpc",
+    srcs = [":kv_store_proto"],
+    grpc_only = True,
+    deps = [":kv_store_cc_proto"]
+)

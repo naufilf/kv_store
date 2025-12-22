@@ -1,4 +1,4 @@
-#include "kvstore/service_impl.h"
+#include "kvstore/src/storage/service_impl.h"
 #include <grpcpp/grpcpp.h>
 #include <iostream>
 #include <memory>
@@ -6,7 +6,9 @@
 
 void RunServer(int port) {
   std::string server_address = "0.0.0.0:" + std::to_string(port);
-  KeyValueServiceImpl service;
+  // Create service with a unique Write-Ahead Log file per port
+  std::string wal_file = "kvstore_" + std::to_string(port) + ".wal";
+  KeyValueServiceImpl service(wal_file);
 
   grpc::ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());

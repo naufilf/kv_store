@@ -1,8 +1,9 @@
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 
-#include "kvstore/kv_store.grpc.pb.h"
+#include "kvstore/protos/kv_store.grpc.pb.h"
 #include <grpcpp/grpcpp.h>
 
 using grpc::Channel;
@@ -68,7 +69,7 @@ public:
 
     if (status.ok() && reply.found()) {
       std::cout << "[Shard " << shard_idx << "] Get Success: " << key
-                << std::endl;
+                << " Value: " << reply.value() << std::endl;
     } else {
       std::cout << "[Shard " << shard_idx << "] Key not found." << std::endl;
     }
@@ -79,17 +80,46 @@ private:
 };
 
 int main(int argc, char **argv) {
-  std::vector<std::string> ports = {"50051", "50052", "50053"};
+  std::vector<std::string> ports;
+  if (argc > 1) {
+    for (int i = 1; i < argc; ++i) {
+      ports.push_back(argv[i]);
+    }
+  } else {
+    ports = {"50051"}; // Default to single server for easier testing
+  }
 
   ShardedClient client(ports);
 
-  std::cout << "---Hashing and Distributin Data ---" << std::endl;
+  std::cout << "Interactive Client Started. Connected to " << ports.size() << " shards." << std::endl;
+  std::cout << "Commands: put <key> <value>, get <key>, quit" << std::endl;
 
-  client.Put("apple", "red");
-  client.Put("banana", "yellow");
-  client.Put("grape", "purple");
-  client.Put("watermelon", "green");
-  client.Put("cherry", "red");
+  std::string line;
+  while (std::cout << "> " && std::getline(std::cin, line)) {
+    std::istringstream iss(line);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd == "put") {
+      std::string key, value;
+      iss >> key >> value;
+      if (!key.empty() && !value.empty()) {
+        client.Put(key, value);
+      } else {
+        std::cout << "Usage: put <key> <value>" << std::endl;
+      }
+    } else if (cmd == "get") {
+      std::string key;
+      iss >> key;
+      if (!key.empty()) {
+        client.Get(key);
+      } else {
+        std::cout << "Usage: get <key>" << std::endl;
+      }
+    } else if (cmd == "quit" || cmd == "exit") {
+      break;
+    }
+  }
 
   return 0;
 }

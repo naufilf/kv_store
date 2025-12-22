@@ -9,3 +9,6 @@ bazel-*
 *.o
 *.so
 *.dylib
+
+# Runtime data
+*.wal
